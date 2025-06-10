@@ -1,0 +1,90 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Report</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/homestyles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Sentiment Report</h1>
+        <a href="{{ url_for('home') }}">Back to Home</a>
+    </header>
+    <table border="1">
+        <tr>
+            <th>Date</th>
+            <th>Title</th>
+            <th>Source</th>
+            <th>Link</th>
+            <th>Predicted Sentiment</th>
+            <th>Sentiment Score</th>
+        </tr>
+        {% for row in sentiment_data %}
+        <tr>
+            <td>{{ row['datetime'] }}</td>
+            <td>{{ row['title'] }}</td>
+            <td>{{ row['source'] }}</td>
+            <td><a href="{{ row['link'] }}" target="_blank">View</a></td>
+            <td>{{ row['predicted_sentiment'] }}</td>
+            <td>{{ row['sentiment_score'] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sentimentstyle.css') }}">
+</head>
+
+<body>
+    <header>
+        <a href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo"
+            class="logo">
+        </a>
+        <nav>
+            <a href="{{ url_for('sentiment') }}" style="color: #fff">Sentiment Report</a>
+            <a href="{{ url_for('signup') }}">Sign Up</a>
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('profile') }}">Profile</a>
+            <a href="{{ url_for('about') }}">About</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1>Sentiment Analysis Report</h1>
+        <!-- <form action="#">
+            <input type="text" id="text" name="text" placeholder="Search news...">
+        </form> -->
+
+        <table border="1">
+            <tr>
+                <th>Date</th>
+                <th>Title</th>
+                <th>Source</th>
+                <th>Link</th>
+                <th>Predicted Sentiment</th>
+                <th>Sentiment Score</th>
+            </tr>
+            {% for row in sentiment_data %}
+            <tr>
+                <td>{{ row['datetime'] }}</td>
+                <td>{{ row['title'] }}</td>
+                <td>{{ row['source'] }}</td>
+                <td><a href="{{ row['link'] }}" target="_blank">View</a></td>
+                <td>{{ row['predicted_sentiment'] }}</td>
+                <td>{{ row['sentiment_score'] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+
+</html>

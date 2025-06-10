@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="loginstyles.css">
+</head>
+<body>
+    <header>
+        <a href="home.html"><img src="logo.png" alt="Logo" class="logo"></a>
+        <nav>
+            <a href="signup.html">Sign Up</a>
+            <a href="login.html">Login</a>
+            <a href="profile.html">Profile</a>
+            <a href="about.html">About</a>
+        </nav>
+    </header>
+    <div class="main-container">
+        <div class="container">
+            <div class="left">
+                <h1>Welcome</h1>
+                <p>Sign up to get started</p>
+            </div>
+            <div class="right">
+                <h2>Get Started Now</h2>
+                <p>Enter your credentials to access your account</p>
+                <form action="#">
+                    <label for="email">Email address</label>
+                    <input type="email" id="email" name="email" required>
+                    
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                    
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                    
+                    <div class="terms">
+                        <input type="checkbox" id="terms" name="terms" required>
+                        <label for="terms">I agree to the <a href="#">Terms & Privacy</a></label>
+                    </div>
+                    
+                    <button type="submit">Register</button>
+                </form>
+                <p>Already a member? <a href="login.html">Login</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="homestyles.css">
+</head>
+<body>
+    <header>
+        <a href="home.html"><img src="logo.png" alt="Logo" class="logo"></a>
+        <nav>
+            <a href="signup.html">Sign Up</a>
+            <a href="login.html">Login</a>
+            <a href="profile.html">Profile</a>
+            <a href="about.html">About</a>
+        </nav>
+    </header>
+    <div class="container">
+        <h1>Stock Prediction</h1>
+        <form>
+            <label for="stock-name">Please choose stock name</label>
+            <select id="stock-name" name="stock-name">
+                <option value="ADBL">ADBL</option>
+                <option value="BHL">BHL</option>
+                <option value="SHIVM">SHIVM</option>
+                <option value="NMB">NMB</option>
+		<option value="NABIL">NABIL</option>
+		<option value="NLG">NLG</option>
+		<option value="UPPER">UPPER</option>
+		<option value="EBL">EBL</option>
+		<option value="STC">STC</option>
+            </select>
+
+            <label for="start-date">Start date</label>
+            <input type="date" id="start-date" name="start-date" required>
+
+            <label for="end-date">End date</label>
+            <input type="date" id="end-date" name="end-date" required>
+
+            <button type="submit">Predict</button>
+        </form>
+        <div class="output">
+            <h2>AAPL Stock Price</h2>
+            <img src="chart.png" alt="Stock Chart">
+        </div>
+    </div>
+</body>
+</html>

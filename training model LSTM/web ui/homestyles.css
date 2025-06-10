@@ -1,0 +1,89 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #1b1b1b;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #2c2c2c;
+}
+
+.logo {
+    width: 150px;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 10px;
+    font-size: 16px;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px;
+    background-color: #2c2c2c;
+    border-radius: 10px;
+    margin: 20px auto;
+    width: 80%;
+    max-width: 1000px;
+}
+
+h1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 600px;
+}
+
+label {
+    margin-bottom: 10px;
+}
+
+input[type="date"],
+select {
+    padding: 10px;
+    margin-bottom: 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #3a3a3a;
+    color: #fff;
+}
+
+button[type="submit"] {
+    background-color: #6c63ff;
+    color: #fff;
+    border: none;
+    padding: 15px 30px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.output {
+    margin-top: 40px;
+}
+
+.output h2 {
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+.output img {
+    width: 100%;
+    border-radius: 10px;
+}

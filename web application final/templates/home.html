@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/homestyles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .output {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <a href="{{ url_for('home') }}">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="logo">
+        </a>
+        <nav>
+            <a href="{{ url_for('sentiment') }}" style="color: #fff">Sentiment Report</a>
+            <a href="{{ url_for('signup') }}">Sign Up</a>
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('profile') }}">Profile</a>
+            <a href="{{ url_for('about') }}">About</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1>Stock Prediction</h1>
+        <form id="predictForm">
+            <label for="stock-name">Please choose stock name:</label>
+            <select id="stock-name" name="stock-name"></select>
+
+            <label for="days">Number of days to predict:</label>
+            <select id="days" name="days" required>
+                <option value="7">7 Days</option>
+                <option value="10">10 Days</option>
+                <option value="15">15 Days</option>
+            </select>
+
+            <button type="submit">Predict</button>
+        </form>
+
+        <div class="output" id="outputSection">
+            <!-- Historical Statistics -->
+            <h2>Historical Data Statistics</h2>
+            <table id="historical-stats">
+                <tr>
+                    <th>Statistics</th>
+                    <th>Open</th>
+                    <th>High</th>
+                    <th>Low</th>
+                    <th>Close</th>
+                </tr>
+            </table>
+
+            <!-- Prediction Table -->
+            <h2>Prediction Results</h2>
+            <table id="prediction-result">
+                <tr>
+                    <th>Day</th>
+                    <th>Open</th>
+                    <th>High</th>
+                    <th>Low</th>
+                    <th>Close</th>
+                </tr>
+            </table>
+
+            <h2>Prediction Graph (LTP)</h2>
+            <div class="chart-container">
+                <canvas id="predictionChart"></canvas>
+            </div>
+
+            <!-- Accuracy Metrics -->
+            <h2>Accuracy Metrics</h2>
+            <table id="accuracy-metrics">
+                <tr>
+                    <th>Metric</th>
+                    <th>Open</th>
+                    <th>High</th>
+                    <th>Low</th>
+                    <th>Close</th>
+                </tr>
+            </table>
+            <p>MAE: Mean Absolute Error</p>
+            <p>RMSE: Root Mean Square Error</p>
+            <p>MAPE: Mean Absolute Percentage Error</p>
+        </div>
+    </div>
+
+    <script>
+        async function fetchStockSymbols() {
+            try {
+                const response = await fetch('/get_stock_symbols');
+                const data = await response.json();
+                const stockNameSelect = document.getElementById('stock-name');
+
+                stockNameSelect.innerHTML = '<option value="">Select a stock</option>';
+                data.symbols.forEach(symbol => {
+                    const option = document.createElement('option');
+                    option.value = symbol;
+                    option.textContent = symbol;
+                    stockNameSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching stock symbols:', error);
+            }
+        }
+
+        window.onload = fetchStockSymbols;
+
+        document.getElementById('predictForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const stockName = document.getElementById('stock-name').value;
+            const days = document.getElementById('days').value;
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ stock_name: stockName, days: days })
+                });
+
+                const result = await response.json();
+                document.getElementById('outputSection').style.display = 'block';
+
+                // Populate Historical Stats
+                const statsTable = document.getElementById('historical-stats');
+                statsTable.innerHTML = `
+                    <tr><th>Statistic</th><th>Open</th><th>High</th><th>Low</th><th>Close</th></tr>
+                    <tr><td>Average</td><td>${result.stats.Open.Average}</td><td>${result.stats.High.Average}</td><td>${result.stats.Low.Average}</td><td>${result.stats.Close.Average}</td></tr>
+                    <tr><td>Min</td><td>${result.stats.Open.Min}</td><td>${result.stats.High.Min}</td><td>${result.stats.Low.Min}</td><td>${result.stats.Close.Min}</td></tr>
+                    <tr><td>Max</td><td>${result.stats.Open.Max}</td><td>${result.stats.High.Max}</td><td>${result.stats.Low.Max}</td><td>${result.stats.Close.Max}</td></tr>
+                    <tr><td>Standard Deviation</td><td>${result.stats.Open["Std Dev"]}</td><td>${result.stats.High["Std Dev"]}</td><td>${result.stats.Low["Std Dev"]}</td><td>${result.stats.Close["Std Dev"]}</td></tr>
+                    <tr><td>Variance</td><td>${result.stats.Open.Variance}</td><td>${result.stats.High.Variance}</td><td>${result.stats.Low.Variance}</td><td>${result.stats.Close.Variance}</td></tr>
+                `;
+
+                // Populate Predictions
+                const predictionTable = document.getElementById('prediction-result');
+                predictionTable.innerHTML = `<tr><th>Day</th><th>Open</th><th>High</th><th>Low</th><th>Close</th></tr>`;
+                result.predictions.forEach(item => {
+                    const row = `<tr><td>${item.Day}</td><td>${item.Open}</td><td>${item.High}</td><td>${item.Low}</td><td>${item.Close}</td></tr>`;
+                    predictionTable.innerHTML += row;
+                });
+
+                const ctx = document.getElementById('predictionChart').getContext('2d');
+
+                // Destroy the previous chart if it exists
+                if (window.predictionChart && typeof window.predictionChart.destroy === 'function') {
+                    window.predictionChart.destroy();
+                }
+
+                // Extract data for each OHLC component from the result
+                const dates = result.dates.concat(new Array(parseInt(days)).fill('').map((_, i) => `Day ${i + 1}`));
+
+                const actualOpen = result.actual_prices.Open;
+                const actualHigh = result.actual_prices.High;
+                const actualLow = result.actual_prices.Low;
+                const actualClose = result.actual_prices.Close;
+
+                const predictedOpen = result.predicted_prices.Open.concat(result.predictions.map(p => p.Open));
+                const predictedHigh = result.predicted_prices.High.concat(result.predictions.map(p => p.High));
+                const predictedLow = result.predicted_prices.Low.concat(result.predictions.map(p => p.Low));
+                const predictedClose = result.predicted_prices.Close.concat(result.predictions.map(p => p.Close));
+
+                window.predictionChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: dates,
+                        datasets: [
+                            {
+                                label: 'Actual Close',
+                                data: actualClose,
+                                borderColor: 'blue',
+                                fill: false,
+                            },
+                            {
+                                label: 'Predicted Close',
+                                data: predictedClose,
+                                borderColor: 'red',
+                                fill: false,
+                            }
+                        ]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Price'
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Populate Accuracy Metrics
+                const accuracyTable = document.getElementById('accuracy-metrics');
+                accuracyTable.innerHTML = `
+                    <tr><th>Metric</th><th>Open</th><th>High</th><th>Low</th><th>Close</th></tr>
+                    <tr><td>MAE (Rs)</td><td>${result.accuracy.Open.MAE}</td><td>${result.accuracy.High.MAE}</td><td>${result.accuracy.Low.MAE}</td><td>${result.accuracy.Close.MAE}</td></tr>
+                    <tr><td>RMSE (Rs)</td><td>${result.accuracy.Open.RMSE}</td><td>${result.accuracy.High.RMSE}</td><td>${result.accuracy.Low.RMSE}</td><td>${result.accuracy.Close.RMSE}</td></tr>
+                    <tr><td>MAPE (%)</td><td>${result.accuracy.Open.MAPE}%</td><td>${result.accuracy.High.MAPE}%</td><td>${result.accuracy.Low.MAPE}%</td><td>${result.accuracy.Close.MAPE}%</td></tr>
+                `;
+
+            } catch (error) {
+                console.error('Error fetching prediction:', error);
+                alert('An error occurred while fetching predictions.');
+            }
+        };
+    </script>
+</body>
+
+</html>
